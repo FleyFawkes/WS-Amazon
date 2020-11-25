@@ -1,2 +1,4 @@
 .idea
 venv/
+ws_amazon_1_categoriesOfSearch.txt
+ws_amazon_1_categoriesOfSearch_2.txt
