@@ -1,0 +1,23 @@
+I need someone who can help me with scraping data from Amazon at medium scale (too much for just a human, but not millions of lines of data).
+
+I'd like to be able to give you a keyword, and I'd like for you to be able to return to me in a spreadsheet the top 50 products, and various attributes on those products (price, rating, # reviews, brand, and more, name of the seller).
+
+Then for the seller for each of those products I'd like to pull various pieces of info about each, for example, their business address (from their Amazon profile), how many products they sell, and stats on the products they sell.
+
+I can lay this all out in more detail once we work together.
+
+I'm comfortable paying for this hourly or fixed, or per scrape request, or however works best.
+
+--------
+name					+
+price					+
+rating					+
+numberOfRatings				+
+item url				+
+brand(brand url to amazon shop site)
+img url
+In stock/unavaible
+product details:
+	best seller rank
+	manufacturer
+	package dimensions
