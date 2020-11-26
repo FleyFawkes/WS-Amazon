@@ -184,6 +184,6 @@ if __name__ == '__main__':
     print('select the category of the search, by typing the index of the category in number:\n'
           f'{category_2}')
     index = int(input())
-    print('how many entries would you like to get? type in number (2+)(approximates)(~50 under 2minutes):')
+    print('how many entries would you like to get? type in number (2+)(approximates)(~50 under 2 minutes):')
     scrape = int(input())
     main()
