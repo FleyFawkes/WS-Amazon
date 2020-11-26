@@ -17,22 +17,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 #
 # fix "synchronous xmlhttprequest on the main thread is deprecated" bug. I'm downloading some
 #   script from amazon, somewhere one of the tags has script which starts jquery.
-#
-# sometimes image_url is : data:image/webp;base64... and go on on on on , its working, but site
-# it redirects to is not protected and is not amazon?
 
 
 def main():
     options = Options()
     options.add_argument('--incognito')
-    options.headless = False
+    options.headless = True
     options.page_load_strategy = 'normal'
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
     master_list = []  # list of dictionaries for data
     item_url_list = []  # list of item urls for data
     number_on_site = 1  # one of number limit used in number of scrapes. Scrape input is second one
-    page_number = 2  # number of page being scraped
+    page_number = 1  # number of page being scraped
 
     index_2 = f'{index}'
     url = category[f'{category_2[index_2]}']
@@ -79,23 +76,22 @@ def main():
             number_on_site += 1
         if number_on_site < scrape:
             url_2 = soup.find('ul', {'class': 'a-pagination'})
-            for url_2_a in url_2:
-                if 'page=' not in driver.current_url:
-                    link_next = url_2.find_all('a')
-                    for a in link_next:
-                        if a.text == '2':
-                            url_2_link = 'https://www.amazon.com/'+a['href']
-                            page_number += 1
-                            driver.get(url_2_link)
-                if f'page={page_number}' in driver.current_url:
-                    link_page = url_2.find('a')['href']
-                    page_number_2 = page_number + 1
-                    link_page_2 = link_page.replace(f'page={page_number}', f'page={page_number_2}')
-                    link_page_3 = link_page_2.replace(f'sr_pg{page_number}', f'sr_pg{page_number_2}')
-                    page_number += 1
-                    driver.get(link_page_3)
-                else:
-                    break
+            url_2_a = url_2.find_all('a')
+            if 'page=' not in driver.current_url:
+                for a in url_2_a:
+                    if a.text == '2':
+                        url_2_link = 'https://www.amazon.com/'+a['href']
+                        page_number += 1
+                        driver.get(url_2_link)
+            if f'page={page_number}' in driver.current_url:
+                link_page = driver.current_url
+                page_number_2 = page_number + 1
+                link_page_2 = link_page.replace(f'page={page_number}', f'page={page_number_2}')
+                link_page_3 = link_page_2.replace(f'sr_pg_{page_number}', f'sr_pg_{page_number_2}')
+                page_number += 1
+                driver.get(link_page_3)
+        else:
+            break
 
     a = 0  # master_list index for dictionaries to iterate through
 
@@ -188,6 +184,6 @@ if __name__ == '__main__':
     print('select the category of the search, by typing the index of the category in number:\n'
           f'{category_2}')
     index = int(input())
-    print('how many entries would you like to get? type in number (2+)(~50 under 2minutes):')
+    print('how many entries would you like to get? type in number (2+)(approximates)(~50 under 2minutes):')
     scrape = int(input())
     main()
