@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm
+from time import sleep
 
 # TODO to finish:
 # product details:
@@ -37,6 +38,7 @@ def web_scrape():
     driver.get(url)
 
     print('initializing, please wait.')
+    pbar = tqdm(total=scrape)
 
     while number_on_site < scrape:
         html = driver.page_source
@@ -77,6 +79,7 @@ def web_scrape():
                         continue
             master_list.append(data_dict)
             number_on_site += 1
+            pbar.update(1)
         if number_on_site < scrape:
             url_2 = soup.find('ul', {'class': 'a-pagination'})
             url_2_a = url_2.find_all('a')
@@ -96,6 +99,7 @@ def web_scrape():
         else:
             break
 
+    pbar.close()
     a = 0  # master_list index for dictionaries to iterate through
 
     print('collecting entries')
