@@ -24,3 +24,4 @@ WILL ADD:
    - data being scraped - best seller rank, manufacturer, item dimensions, seller information.
    - sqlite data base for scraped entries.
    - option for choosing how to save data: .csv, .xlsx, .txt, .json, DB.
+   - change web scrapper into POM/OOP.
