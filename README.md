@@ -25,3 +25,4 @@ WILL ADD:
    - sqlite data base for scraped entries.
    - option for choosing how to save data: .csv, .xlsx, .txt, .json, DB.
    - change web scrapper into POM/OOP.
+   - scikit implementation on DB.
