@@ -6,6 +6,7 @@ FEATURES:
   2. Scrape by amazon categories.
   3. Scrape for provided number of entries(approximately).
   4. Data being scraped:
+    - keyword added to data
     - name
     - price
     - rating in stars
@@ -18,10 +19,11 @@ FEATURES:
    5. Load bar tracking progress.
    6. Headless and in incognito mode, run from CLI.
    7. Data filled into .csv file.
+   8. Scrape with 2 modes - quick and comprehensive one.
    
    
 WILL ADD:
-   - data being scraped - best seller rank, manufacturer, item dimensions, seller information.
+   - data being scraped - best seller rank, manufacturer, item dimensions, seller information, time of scrape.
    - sqlite data base for scraped entries.
    - option for choosing how to save data: .csv, .xlsx, .txt, .json, DB.
    - change web scrapper into POM/OOP.
