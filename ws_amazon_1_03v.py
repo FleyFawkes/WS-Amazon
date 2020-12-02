@@ -84,6 +84,7 @@ def web_scrape():
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         for result in results:
             data_dict = {}
+            data_dict[f'{keyword}'] = keyword
             try:
                 data_dict['name'] = result.find('span', {'class': 'a-size-base-plus a-color-base a-text-normal'}).text
             except:
@@ -139,65 +140,98 @@ def web_scrape():
 
     pbar.close()
 
-    print('collecting entries')
-
-    for url_3 in tqdm(item_url_list):  # load bar 2
-        driver.get(url_3)
-        soup_product = BeautifulSoup(driver.page_source, 'html.parser')
-        for product in soup_product:
-            try:
-                img_product = product.find('img', {'id': 'landingImage'})['src']
-            except:
-                img_product = 'None'
-            if 'img_url' not in master_list[a]:
-                master_list[a].setdefault('img_url', img_product)
-            try:
-                brand_product = product.find('a', {'id': 'bylineInfo'})['href']
-            except:
-                brand_product = 'None'
+    if quick_search:  # determines quick or comprehensive search.
+        pass
+    else:
+        print('collecting entries')
+        for url_3 in tqdm(item_url_list):  # load bar 2
+            driver.get(url_3)
+            soup_product = BeautifulSoup(driver.page_source, 'html.parser')
+            for product in soup_product:
+                try:
+                    img_product = product.find('img', {'id': 'landingImage'})['src']
+                except:
+                    img_product = 'None'
+                if 'img_url' not in master_list[a]:
+                    master_list[a].setdefault('img_url', img_product)
+                try:
+                    brand_product = product.find('a', {'id': 'bylineInfo'})['href']
+                except:
+                    brand_product = 'None'
+                    if 'brand_url' not in master_list[a]:
+                        master_list[a].setdefault('brand_url', brand_product)
                 if 'brand_url' not in master_list[a]:
-                    master_list[a].setdefault('brand_url', brand_product)
-            if 'brand_url' not in master_list[a]:
-                master_list[a].setdefault('brand_url', 'https://www.amazon.com/'+brand_product)
-            try:
-                stock_product = product.find('span', {'class': 'a-size-medium a-color-success'}).text
-            except:
+                    master_list[a].setdefault('brand_url', 'https://www.amazon.com/'+brand_product)
                 try:
-                    stock_product = product.find('span', {'class': 'a-color-price a-text-bold'}).text
-                except AttributeError:
-                    stock_product = 'None'
-            else:
-                try:
-                    multi_seller_link = product.find_all('a')
-                    for link in multi_seller_link:
-                        if link.text == 'these sellers':
-                            stock_product = 'https://www.amazon.com/'+link['href']
-                except TypeError:
-                    stock_product = 'TypeError'
-            if 'in_stock' not in master_list[a]:
-                stock_product_form_1 = stock_product.replace('\n', '')
-                master_list[a].setdefault('in_stock', stock_product_form_1)
-            product_details = product.find('div', {'id': 'detailBulletsWrapper_feature_div'})
-            # add product detail stuff
-        a += 1
+                    stock_product = product.find('span', {'class': 'a-size-medium a-color-success'}).text
+                except:
+                    try:
+                        stock_product = product.find('span', {'class': 'a-color-price a-text-bold'}).text
+                    except AttributeError:
+                        stock_product = 'None'
+                else:
+                    try:
+                        multi_seller_link = product.find_all('a')
+                        for link in multi_seller_link:
+                            if link.text == 'these sellers':
+                                stock_product = 'https://www.amazon.com/'+link['href']
+                    except TypeError:
+                        stock_product = 'TypeError'
+                if 'in_stock' not in master_list[a]:
+                    stock_product_form_1 = stock_product.replace('\n', '')
+                    master_list[a].setdefault('in_stock', stock_product_form_1)
+                product_details = product.find('div', {'id': 'detailBulletsWrapper_feature_div'})
+                # add product detail stuff
+            a += 1
 
     driver.quit()
 
-    amazon_df = pd.DataFrame(master_list)
+    get_data(master_list)
+
+
+def get_data(data):
+    amazon_df = pd.DataFrame(data)
     amazon_df.to_csv(f'ws_amazon_1_{keyword}.csv', index=False)
+
+
+def get_index(prompt):
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            print("That's not an integer!")
+
+
+def get_scrape(prompt):
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            print("That's not an integer!")
+
+
+def get_search(prompt):
+    while True:
+        try:
+            return {"q": True, "c": False}[input(prompt).lower()]
+        except KeyError:
+            print("Invalid input please enter (q) or (c)!")
 
 
 def inputs():
     global keyword
     global index
     global scrape
-    print('type a keyword to search:')
+    global quick_search
+    print('Type a keyword to search:')
     keyword = input()
-    print('select the category of the search, by typing the index of the category in number:\n'
+    print('Select the category of the search, by typing the index of the category in number:\n'
           f'{category_2}')
-    index = int(input())
-    print('how many entries would you like to get? type in number (2+)(~50 under 4 minutes):')
-    scrape = int(input())
+    get_index(index)
+    print('Would you like a (q)uick[~50 in 4sec] or (c)omprehensive[~50 in 4mins] search?:')
+    get_search(quick_search)
+    print('How many entries would you like to get? type in number:')
+    get_scrape(scrape)
 
 
 def main():
