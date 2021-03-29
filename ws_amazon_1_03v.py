@@ -5,15 +5,16 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm
 
-
 # TODO to finish:
-# product details:
-#     best seller rank
-#     manufacturer
-#     dimensions
-#
-# fix "synchronous xmlhttprequest on the main thread is deprecated" bug. I'm downloading some
-#   script from amazon, somewhere one of the tags has script which starts jquery.
+"""
+product details:
+    best seller rank
+    manufacturer
+    dimensions
+
+fix "synchronous xmlhttprequest on the main thread is deprecated" bug. I'm downloading some
+  script from amazon, somewhere one of the tags has script which starts jquery.
+"""
 
 
 def web_scrape(category, category_2):
@@ -23,11 +24,11 @@ def web_scrape(category, category_2):
     options.page_load_strategy = 'eager'
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
-    master_list = []    # list of dictionaries for data
+    master_list = []  # list of dictionaries for data
     item_url_list = []  # list of item urls for data
     number_on_site = 1  # one of number limit used in number of scrapes. Scrape input is second one
-    page_number = 1     # number used for page hopping
-    a = 0   # master_list index for dictionaries to iterate through
+    page_number = 1  # number used for page hopping
+    a = 0  # master_list index for dictionaries to iterate through
 
     index_2 = f'{index}'
     url = category[f'{category_2[index_2]}']
@@ -61,7 +62,8 @@ def web_scrape(category, category_2):
                 data_dict['rating_out_of_5'] = rating
             except:
                 data_dict['rating_out_of_5'] = 'None'
-            data_dict['item_url'] = 'https://www.amazon.com/'+result.find('a', {'class': 'a-link-normal a-text-normal'})['href']
+            data_dict['item_url'] = 'https://www.amazon.com/' + \
+                                    result.find('a', {'class': 'a-link-normal a-text-normal'})['href']
             item_url_list.append(data_dict['item_url'])
             if data_dict['rating_out_of_5'] == 'None':
                 data_dict['reviews'] = 0
@@ -80,13 +82,15 @@ def web_scrape(category, category_2):
             master_list.append(data_dict)
             number_on_site += 1
             pbar.update(1)
+            if number_on_site > scrape:
+                break
         if number_on_site < scrape:  # page hopping mechanism
             url_2 = soup.find('ul', {'class': 'a-pagination'})
             url_2_a = url_2.find_all('a')
             if 'page=' not in driver.current_url:
                 for link_a in url_2_a:
                     if link_a.text == '2':
-                        url_2_link = 'https://www.amazon.com/'+link_a['href']
+                        url_2_link = 'https://www.amazon.com/' + link_a['href']
                         page_number += 1
                         driver.get(url_2_link)
             if f'page={page_number}' in driver.current_url:
@@ -105,7 +109,7 @@ def web_scrape(category, category_2):
         pass
     else:
         print('collecting entries')
-        pbar_2 = tqdm(total=len(item_url_list))     # load bar 2
+        pbar_2 = tqdm(total=len(item_url_list))  # load bar 2
         for url_3 in item_url_list:
             driver.get(url_3)
             soup_product = BeautifulSoup(driver.page_source, 'html.parser')
@@ -123,7 +127,7 @@ def web_scrape(category, category_2):
                     if 'brand_url' not in master_list[a].keys():
                         master_list[a].setdefault('brand_url', brand_product)
                 if 'brand_url' not in master_list[a].keys():
-                    master_list[a].setdefault('brand_url', 'https://www.amazon.com/'+brand_product)
+                    master_list[a].setdefault('brand_url', 'https://www.amazon.com/' + brand_product)
                 try:
                     stock_product = product.find('span', {'class': 'a-size-medium a-color-success'}).text
                 except:
@@ -136,7 +140,7 @@ def web_scrape(category, category_2):
                         multi_seller_link = product.find_all('a')
                         for link in multi_seller_link:
                             if link.text == 'these sellers':
-                                stock_product = 'https://www.amazon.com/'+link['href']
+                                stock_product = 'https://www.amazon.com/' + link['href']
                     except TypeError:
                         stock_product = 'TypeError'
                 if 'in_stock' not in master_list[a].keys():
