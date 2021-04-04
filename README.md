@@ -4,7 +4,7 @@ Amazon web scrapper.
 FEATURES:
   1. Scrape amazon products by providing your product name.
   2. Scrape by amazon categories.
-  3. Scrape for provided number of entries(approximately).
+  3. Scrape for provided number of entries.
   4. Data being scraped:
     - keyword added to data
     - name
