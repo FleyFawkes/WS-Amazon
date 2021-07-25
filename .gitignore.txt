@@ -7,3 +7,7 @@ shit.txt
 venv
 .vscode
 .vscode/
+venv/
+.vscode/*
+**/.vscode/
+**/venv/
