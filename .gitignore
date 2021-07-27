@@ -3,7 +3,6 @@ venv/*
 ws_amazon_1_categoriesOfSearch.txt
 ws_amazon_1_categoriesOfSearch_2.txt
 .csv
-shit.txt
 venv
 .vscode
 .vscode/
@@ -11,3 +10,9 @@ venv/
 .vscode/*
 **/.vscode/
 **/venv/
+.csv
+*.csv
+memo.txt
+captcha/*
+captcha_solver.py
+__pycache__
