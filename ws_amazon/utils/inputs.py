@@ -1,10 +1,14 @@
 from pandas import DataFrame
+from os import path
+import yaml
+from datetime import datetime
 
 
 def save_data(data: list, keyword: any, datatype: str) -> None:
+    time = datetime.now().strftime("%H_%M_%S")
     if datatype == "csv":
         amazon_df = DataFrame(data)
-        amazon_df.to_csv(f'ws_amazon_{keyword}.csv', index=False)
+        amazon_df.to_csv(f'ws_amazon_{keyword}_{time}.csv', index=False)
     elif datatype == "txt":
         pass
     elif datatype == "db":
@@ -53,7 +57,25 @@ def get_quick_search() -> bool:
 
 def inputs(category: dict) -> tuple:
     """inputs for scraping:
-    keyword, index of category, quick or comprehesive search, no. of entries, how to save the data"""
+
+    keyword: searching phrase (str)
+    index: index of category in positive integer (str)
+    quick_search: True for quick or False for comprehesive search (bool)
+    scrape: no. of entries (int)
+    datatype: data format (str)
+
+    config.yaml in the same folder as ws_amazon.py for input configuration, if not, through CLI"""
+    if path.exists("./config.yaml"):
+        with open("./config.yaml", "r") as f:
+            data = yaml.safe_load(f)
+            keyword = data["keyword"]
+            index = data["index"]
+            quick_search = data["quick_search"]
+            scrape = data["scrape"]
+            datatype = data["datatype"]
+
+        return keyword, index, quick_search, scrape, datatype
+
     print('Type a keyword to search for:')
     keyword = str(input())
     print('Select the category of the search, by typing the index of the category in number:\n'

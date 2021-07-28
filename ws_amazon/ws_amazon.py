@@ -7,15 +7,23 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm
 from time import sleep
+from datetime import datetime
 
 # TODO: product details + more
 
 
-def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, datatype):
+def web_scrape(category_1, category_2, keyword, index, quick_search, scrape):
     options = Options()
     options.add_argument('--incognito')
     options.headless = True
     options.page_load_strategy = 'eager'
+
+    master_list = []  # list of dictionaries for data
+    item_url_list = []  # list of item urls for data
+    # one of number limits used in number of scrapes. Scrape input is second one
+    number_on_site = 1
+    page_number = 1  # number used for page hopping
+    time = datetime.now().strftime("%H_%M_%S")
 
     url = category_1[f'{category_2[index]}']
 
@@ -27,12 +35,6 @@ def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, dat
             if captcha_bot not in check:
                 break
             sleep(2)
-
-        master_list = []  # list of dictionaries for data
-        item_url_list = []  # list of item urls for data
-        # one of number limits used in number of scrapes. Scrape input is second one
-        number_on_site = 1
-        page_number = 1  # number used for page hopping
 
         print('initializing, please wait.')
         pbar = tqdm(total=scrape)  # load bar 1
@@ -46,6 +48,7 @@ def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, dat
                 data_dict = {}
                 data_dict['keyword'] = keyword
                 data_dict['category'] = category_2[index]
+                data_dict['timestamp'] = time
                 try:
                     data_dict['name'] = result.find(
                         'span', {'class': 'a-size-base-plus a-color-base a-text-normal'}).text
@@ -99,16 +102,17 @@ def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, dat
             comprehensive_search(item_url_list, master_list,
                                  0, driver, tqdm, BeautifulSoup)
 
-    save_data(master_list, keyword, datatype)
-    print('Done')
+    return master_list
 
 
 def main():
     category_2 = categories_2()
     keyword, index, quick_search, scrape, datatype = inputs(categories_2())
     category_1 = categories_1(keyword)
-    web_scrape(category_1, category_2, keyword,
-               index, quick_search, scrape, datatype)
+    master_list = web_scrape(category_1, category_2, keyword,
+                             index, quick_search, scrape)
+    save_data(master_list, keyword, datatype)
+    print('Done')
 
 
 if __name__ == '__main__':
