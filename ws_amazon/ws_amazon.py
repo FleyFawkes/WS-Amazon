@@ -1,6 +1,6 @@
-from utils.amazon_shop import *
-from utils.inputs import *
-from utils.processing import *
+from utils.amazon_shop import WebDriverContext
+from utils.inputs import inputs, save_data, categories_1, categories_2
+from utils.processing import page_hopping, comprehensive_search
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -8,7 +8,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm
 from time import sleep
 
-#TODO: product details + more
+# TODO: product details + more
+
 
 def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, datatype):
     options = Options()
@@ -28,7 +29,6 @@ def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, dat
             sleep(2)
 
         master_list = []  # list of dictionaries for data
-        a = 0  # master_list index for dictionaries to iterate through
         item_url_list = []  # list of item urls for data
         # one of number limits used in number of scrapes. Scrape input is second one
         number_on_site = 1
@@ -37,7 +37,7 @@ def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, dat
         print('initializing, please wait.')
         pbar = tqdm(total=scrape)  # load bar 1
 
-        while number_on_site < scrape:  # scraping amazon products
+        while number_on_site < scrape:  # quick scraping amazon products
             html = driver.page_source
             soup = BeautifulSoup(html, 'html.parser')
             results = soup.find_all(
@@ -95,60 +95,9 @@ def web_scrape(category_1, category_2, keyword, index, quick_search, scrape, dat
                 break
         pbar.close()
 
-        if quick_search:  # determines quick or comprehensive search, meaning, iterating over item urls for more info
-            pass
-        else:
-            print('collecting entries')
-            pbar_2 = tqdm(total=len(item_url_list))  # load bar 2
-            for url_3 in item_url_list:
-                driver.get(url_3)
-                soup_product = BeautifulSoup(driver.page_source, 'html.parser')
-                for product in soup_product:
-                    try:
-                        img_product = product.find(
-                            'img', {'id': 'landingImage'})['src']
-                    except:
-                        img_product = 'None'
-                    if 'img_url' not in master_list[a].keys():
-                        master_list[a].setdefault('img_url', img_product)
-                    try:
-                        brand_product = product.find(
-                            'a', {'id': 'bylineInfo'})['href']
-                    except:
-                        brand_product = 'None'
-                        if 'brand_url' not in master_list[a].keys():
-                            master_list[a].setdefault(
-                                'brand_url', brand_product)
-                    if 'brand_url' not in master_list[a].keys():
-                        master_list[a].setdefault(
-                            'brand_url', 'https://www.amazon.com/' + brand_product)
-                    try:
-                        stock_product = product.find(
-                            'span', {'class': 'a-size-medium a-color-success'}).text
-                    except:
-                        try:
-                            stock_product = product.find(
-                                'span', {'class': 'a-color-price a-text-bold'}).text
-                        except AttributeError:
-                            stock_product = 'None'
-                    else:
-                        try:
-                            multi_seller_link = product.find_all('a')
-                            for link in multi_seller_link:
-                                if link.text == 'these sellers':
-                                    stock_product = 'https://www.amazon.com/' + \
-                                        link['href']
-                        except TypeError:
-                            stock_product = 'TypeError'
-                    if 'in_stock' not in master_list[a].keys():
-                        stock_product_form_1 = stock_product.replace('\n', '')
-                        master_list[a].setdefault(
-                            'in_stock', stock_product_form_1)
-                    product_details = product.find(
-                        'div', {'id': 'detailBulletsWrapper_feature_div'})
-                a += 1
-                pbar_2.update(1)
-            pbar_2.close()
+        if not quick_search:  # determines quick or comprehensive search
+            comprehensive_search(item_url_list, master_list,
+                                 0, driver, tqdm, BeautifulSoup)
 
     save_data(master_list, keyword, datatype)
     print('Done')

@@ -1,7 +1,7 @@
 from pandas import DataFrame
 
 
-def save_data(data: list, keyword: any, datatype: str):
+def save_data(data: list, keyword: any, datatype: str) -> None:
     if datatype == "csv":
         amazon_df = DataFrame(data)
         amazon_df.to_csv(f'ws_amazon_{keyword}.csv', index=False)
