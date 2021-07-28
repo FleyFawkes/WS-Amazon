@@ -16,3 +16,4 @@ memo.txt
 captcha/*
 captcha_solver.py
 __pycache__
+captcha

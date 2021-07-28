@@ -1,5 +1,5 @@
 
-class WebDriver:
+class WebDriverContext:
     """context manager"""
 
     def __init__(self, driver):
